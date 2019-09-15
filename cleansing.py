@@ -3,6 +3,7 @@ pd.set_option('display.max_columns', 90)
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats import skew
 matplotlib.rcParams['figure.figsize'] = (12.0, 6.0)
 
 import seaborn as sns
@@ -12,11 +13,12 @@ import warnings
 def ignore_warn(*args, **kwargs):
     pass
 warnings.warn = ignore_warn
+from scipy.special import boxcox1p
 
 from scipy import stats
 from scipy.stats import norm, skew #for some statistics
 
-pd.set_option('display.float_format', lambda x: '{:.3f}'.format(x)) #Limiting floats output to 3 decimal points
+pd.set_option('display.float_format', lambda x: '{:.9f}'.format(x)) #Limiting floats output to 3 decimal points
 
 train = pd.read_csv('train.csv')
 
@@ -63,7 +65,6 @@ fig = plt.figure()
 res = stats.probplot(train['SalePrice'], plot=plt)
 plt.show()
 
-
 y = train.SalePrice.values
 train.drop(['SalePrice'], axis=1, inplace=True)
 
@@ -94,13 +95,20 @@ train.describe()
 
 train.head(10)
 
-'''
 train['MSSubClass'] = train['MSSubClass'].apply(str)
 train['OverallQual'] = train['OverallQual'].apply(str)
 train['OverallCond'] = train['OverallCond'].apply(str)
+train['BsmtFullBath'] = train['BsmtFullBath'].apply(str)
+train['BsmtHalfBath'] = train['BsmtHalfBath'].apply(str)
+train['FullBath'] = train['FullBath'].apply(str)
+train['HalfBath'] = train['HalfBath'].apply(str)
 train['MoSold'] = train['MoSold'].apply(str)
 train['YrSold'] = train['YrSold'].apply(str)
-'''
+train['BedroomAbvGr'] = train['BedroomAbvGr'].apply(str)
+train['KitchenAbvGr'] = train['KitchenAbvGr'].apply(str)
+train['Fireplaces'] = train['Fireplaces'].apply(str)
+
+print(train['SaleType'].mode()[0])
 
 
 df_test = pd.read_csv('test.csv')
@@ -117,7 +125,7 @@ for name, ty in cols:
             print(list(set(list(train[name]))))
             
             if ty == object:
-                df_test[name] = df_test[name].fillna('no_info')
+                df_test[name] = df_test[name].fillna(train[name].mode()[0])
                 values_missing = list(set(list(df_test[name])) - set(list(train[name])))
                 if len(values_missing) != 0:
                     print('misssing in training', values_missing)
@@ -137,19 +145,78 @@ df_test['BsmtFullBath'] = df_test['BsmtFullBath'].fillna(0)
 df_test['BsmtHalfBath'] = df_test['BsmtHalfBath'].fillna(0)
 df_test['GarageYrBlt'] = df_test['GarageYrBlt'].fillna(0)
 df_test['GarageCars'] = df_test['GarageCars'].fillna(0)
+# df_test['SaleType'] = df_test['SaleType'].fillna(train['SaleType'].mode()[0])
+# df_test['MSZoning'] = df_test['MSZoning'].fillna(train['MSZoning'].mode()[0])
+# df_test['Utilities'] = df_test['Utilities'].fillna(train['Utilities'].mode()[0])
 
-#df_test['MSSubClass'] = df_test['MSSubClass'].apply(str)
-#df_test['OverallQual'] = df_test['OverallQual'].apply(str)
-#df_test['OverallCond'] = df_test['OverallCond'].apply(str)
-#df_test['MoSold'] = df_test['MoSold'].apply(str)
-#df_test['YrSold'] = df_test['YrSold'].apply(str)
+df_test['MSSubClass'] = df_test['MSSubClass'].apply(str)
+df_test['OverallQual'] = df_test['OverallQual'].apply(str)
+df_test['OverallCond'] = df_test['OverallCond'].apply(str)
+df_test['BsmtFullBath'] = df_test['BsmtFullBath'].astype(float).astype(int).apply(str)
+df_test['BsmtHalfBath'] = df_test['BsmtHalfBath'].astype(float).astype(int).apply(str)
+df_test['FullBath'] = df_test['FullBath'].apply(str)
+df_test['HalfBath'] = df_test['HalfBath'].apply(str)
+df_test['MoSold'] = df_test['MoSold'].apply(str)
+df_test['YrSold'] = df_test['YrSold'].apply(str)
+df_test['BedroomAbvGr'] = df_test['BedroomAbvGr'].apply(str)
+df_test['KitchenAbvGr'] = df_test['KitchenAbvGr'].apply(str)
+df_test['Fireplaces'] = df_test['Fireplaces'].apply(str)
 
+
+numeric_types = [] 
+for c  in train.dtypes.index:
+    if train.dtypes[c] != object:
+        numeric_types.append(c)
+        
+for n_type in numeric_types:
+    fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(12, 4))
+    # print(axes)
+    axes[0].set_title(n_type + ' distribution')
+    # axes[0].set_legend('Normal dist. ($\mu=$ {:.2f}, $\sigma=$ {:.2f} and $\skew={:.2f} )'.format(mu, sigma, skewed_feats), loc='best')
+    
+    # Get the fitted parameters used by the function
+    skewed_feats = skew(train[n_type]) #compute skewness
+    sns.distplot(train[n_type],fit=norm, ax=axes[0], label='Normal dist. ($\mu=$ {:.2f}, $\sigma=$ {:.2f} and $\skew={:.2f} )'.format(mu, sigma, skewed_feats))
+    # print('skew = {:.2f}'.format(skewed_feats))
+    (mu, sigma) = norm.fit(train[n_type])
+    print( '\n normal' + n_type + ' mu = {:.2f}, skew={:.2f} and sigma = {:.2f}\n'.format(mu, skewed_feats, sigma))
+    
+    #Now plot the distribution
+    # plt.legend(['Normal dist. ($\mu=$ {:.2f}, $\sigma=$ {:.2f} and $\skew={:.2f} )'.format(mu, sigma, skewed_feats)],
+    #             loc='best')
+    # plt.ylabel('Frequency')
+    # plt.title(n_type + ' distribution')
+    
+    lam = 0.15
+    if abs(skewed_feats) > 0.75:
+        # skewed_feats_log1p = skew(np.log1p(train[n_type]))
+        skewed_feats_log1p = skew(boxcox1p(train[n_type], lam))
+        if abs(skewed_feats_log1p) < abs(skewed_feats):
+            train[n_type] = boxcox1p(train[n_type], lam)
+            axes[1].set_title(n_type + ' log1p distribution')
+            # axes[1].set_legend('Normal dist. ($\mu=$ {:.2f}, $\sigma=$ {:.2f} and $\skew={:.2f} )'.format(mu, sigma, skewed_feats), loc='best')
+            df_test[n_type] = boxcox1p(df_test[n_type], lam)
+            
+            skewed_feats = skew(train[n_type]) #compute skewness
+            # print('skew = {:.2f}'.format(skewed_feats))
+            (mu, sigma) = norm.fit(train[n_type])
+            print( '\n log1p' + n_type + ' mu = {:.2f}, skew={:.2f} and sigma = {:.2f}\n'.format(mu, skewed_feats, sigma))
+            axes[1] = sns.distplot(train[n_type], fit=norm, ax=axes[1])
+            
+            # plt.legend(['Normal dist. ($\mu=$ {:.2f}, $\sigma=$ {:.2f} and $\skew={:.2f})'.format(mu, sigma, skewed_feats)], loc='best')
+            plt.ylabel('Frequency')
+            plt.title(n_type + ' distribution')
+        
+    # fig.tight_layout()
+    plt.show()
+    
+    
 from sklearn.preprocessing import LabelEncoder
 cols = ('FireplaceQu', 'BsmtQual', 'BsmtCond', 'GarageQual', 'GarageCond', 
         'ExterQual', 'ExterCond','HeatingQC', 'PoolQC', 'KitchenQual', 'BsmtFinType1', 
         'BsmtFinType2', 'Functional', 'Fence', 'BsmtExposure', 'GarageFinish', 'LandSlope',
         'LotShape', 'PavedDrive', 'Street', 'Alley', 'CentralAir', 'MSSubClass', 'OverallCond', 
-        'YrSold', 'MoSold')
+        'YrSold', 'MoSold', 'BedroomAbvGr', 'BedroomAbvGr', 'Fireplaces')
 # process columns, apply LabelEncoder to categorical features
 for c in cols:
     lbl = LabelEncoder() 
@@ -170,13 +237,38 @@ X_train, X_test, y_train, y_test = train_test_split(df_train, y, test_size=0.3, 
 from sklearn.metrics import mean_squared_error
 from math import sqrt
 from xgboost import XGBRegressor
+from sklearn.model_selection import GridSearchCV
+
+xgb1 = XGBRegressor()
+parameters = {'nthread':[1], #when use hyperthread, xgboost may become slower
+              'objective':['reg:squarederror'],
+              'learning_rate': [0.05], #so called `eta` value
+              'max_depth': [3],
+              # 'min_child_weight': [4],
+              'silent': [1],
+              'subsample': [0.7],
+              'colsample_bytree': [0.7],
+              #'n_estimators': [500, 600, 700]}
+              'n_estimators': range(1000, 3001, 100),
+              'nthread': [-1]}
+
+xgb_grid = GridSearchCV(xgb1,
+                        parameters,
+                        cv = 5,
+                        n_jobs = 2,
+                        verbose=5)
+
+xgb_grid.fit(X_train,y_train)
+
+print(xgb_grid.best_score_)
+print(xgb_grid.best_params_)
 
 estimators = []
 x_train_error = []
 x_test_error = []
-for i in enumerate (range(1, 20)):
+for i in enumerate (range(4, 30)):
     estimators.append(i[1] * 100)
-    xgbr = XGBRegressor(learning_rate=0.05, n_estimators=(i[1])*100, random_state=77, verbose=False )
+    xgbr = XGBRegressor(learning_rate=0.05, n_estimators=(i[1])*100, random_state=77, nthread = -1, max_depth=3, subsample=0.5 )
     xgbr.fit(X_train, y_train)
     
     y_hat = xgbr.predict(X_train)
@@ -226,7 +318,16 @@ for i in enumerate (range(2, 10)):
     print(estimators[np.argmin(x_test_error)])
     
 
-xgbr = XGBRegressor(learning_rate=0.05, n_estimators=700, max_depth=3, random_state=77, verbose=False )
+# xgbr = XGBRegressor(learning_rate=0.05, n_estimators=1000, max_depth=3, random_state=77, subsample=0.5, verbose=True)
+
+
+xgbr = XGBRegressor(colsample_bytree=0.4603, gamma=0.0468, 
+                             learning_rate=0.05, max_depth=3, 
+                             min_child_weight=1.7817, n_estimators=2200,
+                             reg_alpha=0.4640, reg_lambda=0.8571,
+                             subsample=0.5213, verbosity=1,
+                             random_state =77, nthread = -1)
+
 xgbr.fit(df_train, y)
 len(xgbr.feature_importances_)
 feat_imp = zip(df_train.columns, xgbr.feature_importances_)
@@ -242,6 +343,7 @@ for col in df_test_converted.columns:
         
 # Columns that are missiing in the test set
 for col in list(set(df_train.columns) - set(df_test_converted.columns)):
+    print('adding', col)
     df_test_converted[col] = 0
     
 # drop extra columns in test as these data is not available for trains
