@@ -240,29 +240,32 @@ from xgboost import XGBRegressor
 from sklearn.model_selection import GridSearchCV
 
 xgb1 = XGBRegressor()
-parameters = {'nthread':[1], #when use hyperthread, xgboost may become slower
+parameters = {'nthread':[-1], #when use hyperthread, xgboost may become slower
               'objective':['reg:squarederror'],
               'learning_rate': [0.05], #so called `eta` value
               'max_depth': [3],
-              # 'min_child_weight': [4],
+              'min_child_weight': [1, 1.5, 2],
               'silent': [1],
-              'subsample': [0.7],
-              'colsample_bytree': [0.7],
+              'subsample': [0.5, 0.6, 0.7],
+              'gamma': [0.03, 0.04, 0.05],
+              'colsample_bytree': [0.4, 0.5, 0.6, 0.7],
               #'n_estimators': [500, 600, 700]}
-              'n_estimators': range(1000, 3001, 100),
-              'nthread': [-1]}
+              'n_estimators': range(1200, 2501, 100)}
 
 xgb_grid = GridSearchCV(xgb1,
                         parameters,
                         cv = 5,
-                        n_jobs = 2,
-                        verbose=5)
+                        n_jobs = 4,
+                        verbose=10)
 
-xgb_grid.fit(X_train,y_train)
+# xgb_grid.fit(X_train,y_train)
+# changing to df_train, y because of CV
+xgb_grid.fit(df_train, y)
 
 print(xgb_grid.best_score_)
 print(xgb_grid.best_params_)
 
+'''
 estimators = []
 x_train_error = []
 x_test_error = []
@@ -316,11 +319,13 @@ for i in enumerate (range(2, 10)):
     plt.show()
     print(np.argmin(x_test_error))
     print(estimators[np.argmin(x_test_error)])
-    
+'''
 
 # xgbr = XGBRegressor(learning_rate=0.05, n_estimators=1000, max_depth=3, random_state=77, subsample=0.5, verbose=True)
+xgbr = XGBRegressor(colsample_bytree= 0.7, learning_rate= 0.05, max_depth= 3, n_estimators= 1400, nthread= -1, objective= 'reg:squarederror', subsample= 0.7, verbose=10)
 
 
+'''
 xgbr = XGBRegressor(colsample_bytree=0.4603, gamma=0.0468, 
                              learning_rate=0.05, max_depth=3, 
                              min_child_weight=1.7817, n_estimators=2200,
@@ -328,6 +333,7 @@ xgbr = XGBRegressor(colsample_bytree=0.4603, gamma=0.0468,
                              subsample=0.5213, verbosity=1,
                              random_state =77, nthread = -1)
 
+'''
 xgbr.fit(df_train, y)
 len(xgbr.feature_importances_)
 feat_imp = zip(df_train.columns, xgbr.feature_importances_)
