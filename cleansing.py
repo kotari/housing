@@ -22,6 +22,12 @@ pd.set_option('display.float_format', lambda x: '{:.9f}'.format(x)) #Limiting fl
 
 train = pd.read_csv('train.csv')
 
+train = train[~((train['GrLivArea'] > 4000) & (train['SalePrice'] < 200000))]
+# train.drop(train['GarageArea'], inplace=True)
+train.drop(train[train.TotalBsmtSF>3000].index, inplace=True)
+train.drop(train[train.YearBuilt<1900].index, inplace=True)
+train.reset_index(drop=True, inplace=True)
+
 
 train.describe()
 train_ID = train['Id']
@@ -81,7 +87,7 @@ for name, ty in cols:
         if len(values) <25:
             print(values)
             if ty == object:
-                train[name] = train[name].fillna('no_info')
+                train[name] = train[name].fillna('None')
         else:
             print('values more than 25')
             print(train[name].describe())
@@ -89,24 +95,24 @@ for name, ty in cols:
             
 train['GarageYrBlt'] = train['GarageYrBlt'].fillna(0) 
 train['LotFrontage'] = train['LotFrontage'].fillna(lot_frontage_median)
-train['MasVnrArea'] = train['MasVnrArea'].fillna(mas_vnr_area_median)
+train['MasVnrArea'] = train['MasVnrArea'].fillna(0)
 
 train.describe()
 
 train.head(10)
 
 train['MSSubClass'] = train['MSSubClass'].apply(str)
-train['OverallQual'] = train['OverallQual'].apply(str)
-train['OverallCond'] = train['OverallCond'].apply(str)
-train['BsmtFullBath'] = train['BsmtFullBath'].apply(str)
-train['BsmtHalfBath'] = train['BsmtHalfBath'].apply(str)
-train['FullBath'] = train['FullBath'].apply(str)
-train['HalfBath'] = train['HalfBath'].apply(str)
+# train['OverallQual'] = train['OverallQual'].apply(str)
+# train['OverallCond'] = train['OverallCond'].apply(str)
+# train['BsmtFullBath'] = train['BsmtFullBath'].apply(str)
+# train['BsmtHalfBath'] = train['BsmtHalfBath'].apply(str)
+# train['FullBath'] = train['FullBath'].apply(str)
+# train['HalfBath'] = train['HalfBath'].apply(str)
 train['MoSold'] = train['MoSold'].apply(str)
 train['YrSold'] = train['YrSold'].apply(str)
-train['BedroomAbvGr'] = train['BedroomAbvGr'].apply(str)
-train['KitchenAbvGr'] = train['KitchenAbvGr'].apply(str)
-train['Fireplaces'] = train['Fireplaces'].apply(str)
+# train['BedroomAbvGr'] = train['BedroomAbvGr'].apply(str)
+# train['KitchenAbvGr'] = train['KitchenAbvGr'].apply(str)
+# train['Fireplaces'] = train['Fireplaces'].apply(str)
 
 print(train['SaleType'].mode()[0])
 
@@ -114,6 +120,15 @@ print(train['SaleType'].mode()[0])
 df_test = pd.read_csv('test.csv')
 test_ID = df_test['Id']
 df_test = df_test.drop(['Id'], axis=1)
+df_test['BsmtQual'] = df_test['BsmtQual'].fillna('None')
+df_test['BsmtCond'] = df_test['BsmtCond'].fillna('None')
+df_test['BsmtExposure'] = df_test['BsmtExposure'].fillna('None')
+df_test['BsmtFinType1'] = df_test['BsmtFinType1'].fillna('None')
+df_test['BsmtFinType2'] = df_test['BsmtFinType2'].fillna('None')
+df_test['GarageType'] = df_test['GarageType'].fillna('None')
+df_test['GarageFinish'] = df_test['GarageFinish'].fillna('None')
+df_test['GarageQual'] = df_test['GarageQual'].fillna('None')
+df_test['GarageCond'] = df_test['GarageCond'].fillna('None')
 cols = zip(df_test.columns, df_test.dtypes)
 for name, ty in cols:
     nan_exists = sum(df_test[name].isnull())
@@ -125,6 +140,7 @@ for name, ty in cols:
             print(list(set(list(train[name]))))
             
             if ty == object:
+                print('filling nan with ', train[name].mode()[0])
                 df_test[name] = df_test[name].fillna(train[name].mode()[0])
                 values_missing = list(set(list(df_test[name])) - set(list(train[name])))
                 if len(values_missing) != 0:
@@ -135,7 +151,7 @@ for name, ty in cols:
             # print(df[name].median())
 
 df_test['LotFrontage'] = df_test['LotFrontage'].fillna(lot_frontage_median)
-df_test['MasVnrArea'] = df_test['MasVnrArea'].fillna(mas_vnr_area_median)
+df_test['MasVnrArea'] = df_test['MasVnrArea'].fillna(0)
 df_test['BsmtFinSF1'] = df_test['BsmtFinSF1'].fillna(0)
 df_test['BsmtFinSF2'] = df_test['BsmtFinSF2'].fillna(0)
 df_test['TotalBsmtSF'] = df_test['TotalBsmtSF'].fillna(0)
@@ -145,22 +161,23 @@ df_test['BsmtFullBath'] = df_test['BsmtFullBath'].fillna(0)
 df_test['BsmtHalfBath'] = df_test['BsmtHalfBath'].fillna(0)
 df_test['GarageYrBlt'] = df_test['GarageYrBlt'].fillna(0)
 df_test['GarageCars'] = df_test['GarageCars'].fillna(0)
+df_test = df_test.replace({'GarageCars': 5}, 4)
 # df_test['SaleType'] = df_test['SaleType'].fillna(train['SaleType'].mode()[0])
 # df_test['MSZoning'] = df_test['MSZoning'].fillna(train['MSZoning'].mode()[0])
 # df_test['Utilities'] = df_test['Utilities'].fillna(train['Utilities'].mode()[0])
 
 df_test['MSSubClass'] = df_test['MSSubClass'].apply(str)
-df_test['OverallQual'] = df_test['OverallQual'].apply(str)
-df_test['OverallCond'] = df_test['OverallCond'].apply(str)
-df_test['BsmtFullBath'] = df_test['BsmtFullBath'].astype(float).astype(int).apply(str)
-df_test['BsmtHalfBath'] = df_test['BsmtHalfBath'].astype(float).astype(int).apply(str)
-df_test['FullBath'] = df_test['FullBath'].apply(str)
-df_test['HalfBath'] = df_test['HalfBath'].apply(str)
+# df_test['OverallQual'] = df_test['OverallQual'].apply(str)
+# df_test['OverallCond'] = df_test['OverallCond'].apply(str)
+# df_test['BsmtFullBath'] = df_test['BsmtFullBath'].astype(float).astype(int).apply(str)
+# df_test['BsmtHalfBath'] = df_test['BsmtHalfBath'].astype(float).astype(int).apply(str)
+# df_test['FullBath'] = df_test['FullBath'].apply(str)
+# df_test['HalfBath'] = df_test['HalfBath'].apply(str)
 df_test['MoSold'] = df_test['MoSold'].apply(str)
 df_test['YrSold'] = df_test['YrSold'].apply(str)
-df_test['BedroomAbvGr'] = df_test['BedroomAbvGr'].apply(str)
-df_test['KitchenAbvGr'] = df_test['KitchenAbvGr'].apply(str)
-df_test['Fireplaces'] = df_test['Fireplaces'].apply(str)
+# df_test['BedroomAbvGr'] = df_test['BedroomAbvGr'].apply(str)
+# df_test['KitchenAbvGr'] = df_test['KitchenAbvGr'].apply(str)
+# df_test['Fireplaces'] = df_test['Fireplaces'].apply(str)
 
 
 numeric_types = [] 
@@ -188,7 +205,7 @@ for n_type in numeric_types:
     # plt.title(n_type + ' distribution')
     
     lam = 0.15
-    if abs(skewed_feats) > 0.75:
+    if abs(skewed_feats) > 0.5:
         # skewed_feats_log1p = skew(np.log1p(train[n_type]))
         skewed_feats_log1p = skew(boxcox1p(train[n_type], lam))
         if abs(skewed_feats_log1p) < abs(skewed_feats):
@@ -240,30 +257,38 @@ from xgboost import XGBRegressor
 from sklearn.model_selection import GridSearchCV
 
 xgb1 = XGBRegressor()
-parameters = {'nthread':[-1], #when use hyperthread, xgboost may become slower
-              'objective':['reg:squarederror'],
+parameters = {'nthread':[1], #when use hyperthread, xgboost may become slower
+              # 'objective':['reg:squarederror'],
               'learning_rate': [0.05], #so called `eta` value
               'max_depth': [3],
-              'min_child_weight': [1, 1.5, 2],
+              'min_child_weight': [1.5, 1.6, 1.7],
               'silent': [1],
-              'subsample': [0.5, 0.6, 0.7],
-              'gamma': [0.03, 0.04, 0.05],
+              'subsample': [0.5, 0.6],
+              'gamma': [0.04, 0.05],
               'colsample_bytree': [0.4, 0.5, 0.6, 0.7],
-              #'n_estimators': [500, 600, 700]}
-              'n_estimators': range(1200, 2501, 100)}
+              'reg_alpha': [0.4, 0.45, 0.5],
+              'reg_lambda': [0.8, 0.87, 0.94, 1],
+              'seed': [77],
+              'n_estimators': range(2000, 2501, 100)}
+
+fit_params = {'early_stopping_rounds': 42,
+              'eval_metric': 'rmse',
+              'eval_set': [[X_test, y_test]]}
 
 xgb_grid = GridSearchCV(xgb1,
                         parameters,
                         cv = 5,
                         n_jobs = 4,
-                        verbose=10)
+                        scoring='r2',
+                        verbose=1)
 
-# xgb_grid.fit(X_train,y_train)
+xgb_grid.fit(X_train,y_train, **fit_params)
 # changing to df_train, y because of CV
-xgb_grid.fit(df_train, y)
+# xgb_grid.fit(df_train, y)
 
 print(xgb_grid.best_score_)
 print(xgb_grid.best_params_)
+print(xgb_grid.best_estimator_)
 
 '''
 estimators = []
@@ -322,7 +347,9 @@ for i in enumerate (range(2, 10)):
 '''
 
 # xgbr = XGBRegressor(learning_rate=0.05, n_estimators=1000, max_depth=3, random_state=77, subsample=0.5, verbose=True)
-xgbr = XGBRegressor(colsample_bytree= 0.7, learning_rate= 0.05, max_depth= 3, n_estimators= 1400, nthread= -1, objective= 'reg:squarederror', subsample= 0.7, verbose=10)
+
+# 0.9067720490811773 {'colsample_bytree': 0.4, 'gamma': 0.04, 'learning_rate': 0.05, 'max_depth': 3, 'min_child_weight': 1, 'n_estimators': 2400, 'nthread': -1, 'silent': 1, 'subsample': 0.5}
+# xgbr = XGBRegressor(colsample_bytree= 0.7, learning_rate= 0.05, max_depth= 3, n_estimators= 1400, nthread= -1, objective= 'reg:squarederror', subsample= 0.7, verbose=10)
 
 
 '''
@@ -334,6 +361,12 @@ xgbr = XGBRegressor(colsample_bytree=0.4603, gamma=0.0468,
                              random_state =77, nthread = -1)
 
 '''
+xgbr = XGBRegressor(base_score=0.5, booster='gbtree', colsample_bylevel=1,
+       colsample_bytree=0.5, gamma=0.04, learning_rate=0.05,
+       max_delta_step=0, max_depth=3, min_child_weight=1.5, missing=None,
+       n_estimators=2000, n_jobs=1, nthread=1, objective='reg:linear',
+       random_state=0, reg_alpha=0.4, reg_lambda=0.8, scale_pos_weight=1,
+       seed=77, silent=1, subsample=0.5)
 xgbr.fit(df_train, y)
 len(xgbr.feature_importances_)
 feat_imp = zip(df_train.columns, xgbr.feature_importances_)
