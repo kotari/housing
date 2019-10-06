@@ -227,7 +227,7 @@ for n_type in numeric_types:
     # fig.tight_layout()
     plt.show()
     
-    
+'''
 from sklearn.preprocessing import LabelEncoder
 cols = ('FireplaceQu', 'BsmtQual', 'BsmtCond', 'GarageQual', 'GarageCond', 
         'ExterQual', 'ExterCond','HeatingQC', 'PoolQC', 'KitchenQual', 'BsmtFinType1', 
@@ -248,6 +248,54 @@ for c in cols:
 print('Shape train: {}'.format(train.shape))
 
 df_train = pd.get_dummies(train)
+'''
+train.LotShape.replace(to_replace = ['IR3', 'IR2', 'IR1', 'Reg'], value = [0, 1, 2, 3], inplace = True)
+train.LandContour.replace(to_replace = ['Low', 'Bnk', 'HLS', 'Lvl'], value = [0, 1, 2, 3], inplace = True)
+train.Utilities.replace(to_replace = ['NoSeWa', 'AllPub'], value = [0, 1], inplace = True)
+train.LandSlope.replace(to_replace = ['Sev', 'Mod', 'Gtl'], value = [0, 1, 2], inplace = True)
+train.ExterQual.replace(to_replace = ['Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3], inplace = True)
+train.ExterCond.replace(to_replace = ['Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4], inplace = True)
+train.BsmtQual.replace(to_replace = ['None', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4], inplace = True)
+train.BsmtCond.replace(to_replace = ['None', 'Po', 'Fa', 'TA', 'Gd'], value = [0, 1, 2, 3, 4], inplace = True)
+train.BsmtExposure.replace(to_replace = ['None', 'No', 'Mn', 'Av', 'Gd'], value = [0, 1, 2, 3, 4], inplace = True)
+train.BsmtFinType1.replace(to_replace = ['None', 'Unf', 'LwQ', 'Rec', 'BLQ', 'ALQ', 'GLQ'], value = [0, 1, 2, 3, 4, 5, 6], inplace = True)
+train.BsmtFinType2.replace(to_replace = ['None', 'Unf', 'LwQ', 'Rec', 'BLQ', 'ALQ', 'GLQ'], value = [0, 1, 2, 3, 4, 5, 6], inplace = True)
+train.HeatingQC.replace(to_replace = ['Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4], inplace = True)
+train.Electrical.replace(to_replace = ['Mix', 'FuseP', 'FuseF', 'FuseA', 'SBrkr'], value = [0, 1, 2, 3, 4], inplace = True)
+train.KitchenQual.replace(to_replace = ['Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3], inplace = True)
+train.Functional.replace(to_replace = ['Sev', 'Maj2', 'Maj1', 'Mod', 'Min2', 'Min1', 'Typ'], value = [0, 1, 2, 3, 4, 5, 6], inplace = True)
+train.FireplaceQu.replace(to_replace =  ['None', 'Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4, 5], inplace = True)
+train.GarageFinish.replace(to_replace =  ['None', 'Unf', 'RFn', 'Fin'], value = [0, 1, 2, 3], inplace = True)
+train.GarageQual.replace(to_replace =  ['None', 'Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4, 5], inplace = True)
+train.GarageCond.replace(to_replace =  ['None', 'Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4, 5], inplace = True)
+train.PavedDrive.replace(to_replace =  ['N', 'P', 'Y'], value = [0, 1, 2], inplace = True)
+train.PoolQC.replace(to_replace =  ['None', 'Fa', 'Gd', 'Ex'], value = [0, 1, 2, 3], inplace = True)
+train.Fence.replace(to_replace =  ['None', 'MnWw', 'GdWo', 'MnPrv', 'GdPrv'], value = [0, 1, 2, 3, 4], inplace = True)
+
+df_test.LotShape.replace(to_replace = ['IR3', 'IR2', 'IR1', 'Reg'], value = [0, 1, 2, 3], inplace = True)
+df_test.LandContour.replace(to_replace = ['Low', 'Bnk', 'HLS', 'Lvl'], value = [0, 1, 2, 3], inplace = True)
+df_test.Utilities.replace(to_replace = ['NoSeWa', 'AllPub'], value = [0, 1], inplace = True)
+df_test.LandSlope.replace(to_replace = ['Sev', 'Mod', 'Gtl'], value = [0, 1, 2], inplace = True)
+df_test.ExterQual.replace(to_replace = ['Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3], inplace = True)
+df_test.ExterCond.replace(to_replace = ['Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4], inplace = True)
+df_test.BsmtQual.replace(to_replace = ['None', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4], inplace = True)
+df_test.BsmtCond.replace(to_replace = ['None', 'Po', 'Fa', 'TA', 'Gd'], value = [0, 1, 2, 3, 4], inplace = True)
+df_test.BsmtExposure.replace(to_replace = ['None', 'No', 'Mn', 'Av', 'Gd'], value = [0, 1, 2, 3, 4], inplace = True)
+df_test.BsmtFinType1.replace(to_replace = ['None', 'Unf', 'LwQ', 'Rec', 'BLQ', 'ALQ', 'GLQ'], value = [0, 1, 2, 3, 4, 5, 6], inplace = True)
+df_test.BsmtFinType2.replace(to_replace = ['None', 'Unf', 'LwQ', 'Rec', 'BLQ', 'ALQ', 'GLQ'], value = [0, 1, 2, 3, 4, 5, 6], inplace = True)
+df_test.HeatingQC.replace(to_replace = ['Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4], inplace = True)
+df_test.Electrical.replace(to_replace = ['Mix', 'FuseP', 'FuseF', 'FuseA', 'SBrkr'], value = [0, 1, 2, 3, 4], inplace = True)
+df_test.KitchenQual.replace(to_replace = ['Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3], inplace = True)
+df_test.Functional.replace(to_replace = ['Sev', 'Maj2', 'Maj1', 'Mod', 'Min2', 'Min1', 'Typ'], value = [0, 1, 2, 3, 4, 5, 6], inplace = True)
+df_test.FireplaceQu.replace(to_replace =  ['None', 'Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4, 5], inplace = True)
+df_test.GarageFinish.replace(to_replace =  ['None', 'Unf', 'RFn', 'Fin'], value = [0, 1, 2, 3], inplace = True)
+df_test.GarageQual.replace(to_replace =  ['None', 'Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4, 5], inplace = True)
+df_test.GarageCond.replace(to_replace =  ['None', 'Po', 'Fa', 'TA', 'Gd', 'Ex'], value = [0, 1, 2, 3, 4, 5], inplace = True)
+df_test.PavedDrive.replace(to_replace =  ['N', 'P', 'Y'], value = [0, 1, 2], inplace = True)
+df_test.PoolQC.replace(to_replace =  ['None', 'Fa', 'Gd', 'Ex'], value = [0, 1, 2, 3], inplace = True)
+df_test.Fence.replace(to_replace =  ['None', 'MnWw', 'GdWo', 'MnPrv', 'GdPrv'], value = [0, 1, 2, 3, 4], inplace = True)
+
+df_train = pd.get_dummies(train)
 
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(df_train, y, test_size=0.3, random_state=77)
@@ -262,7 +310,7 @@ parameters = {'nthread':[1], #when use hyperthread, xgboost may become slower
               'learning_rate': [0.05], #so called `eta` value
               'max_depth': [3],
               'min_child_weight': [1.5, 1.6, 1.7],
-              'silent': [1],
+              'silent': [0],
               'subsample': [0.5, 0.6],
               'gamma': [0.04, 0.05],
               'colsample_bytree': [0.4, 0.5, 0.6, 0.7],
@@ -273,14 +321,14 @@ parameters = {'nthread':[1], #when use hyperthread, xgboost may become slower
 
 fit_params = {'early_stopping_rounds': 42,
               'eval_metric': 'rmse',
-              'eval_set': [[X_test, y_test]]}
+              'eval_set': [(X_train, y_train), (X_test, y_test)]}
 
 xgb_grid = GridSearchCV(xgb1,
                         parameters,
                         cv = 5,
                         n_jobs = 4,
                         scoring='r2',
-                        verbose=1)
+                        verbose=0)
 
 xgb_grid.fit(X_train,y_train, **fit_params)
 # changing to df_train, y because of CV
@@ -360,18 +408,28 @@ xgbr = XGBRegressor(colsample_bytree=0.4603, gamma=0.0468,
                              subsample=0.5213, verbosity=1,
                              random_state =77, nthread = -1)
 
-'''
+
 xgbr = XGBRegressor(base_score=0.5, booster='gbtree', colsample_bylevel=1,
        colsample_bytree=0.5, gamma=0.04, learning_rate=0.05,
        max_delta_step=0, max_depth=3, min_child_weight=1.5, missing=None,
        n_estimators=2000, n_jobs=1, nthread=1, objective='reg:linear',
        random_state=0, reg_alpha=0.4, reg_lambda=0.8, scale_pos_weight=1,
        seed=77, silent=1, subsample=0.5)
+'''
+xgbr = XGBRegressor(base_score=0.5, booster='gbtree', colsample_bylevel=1,
+       colsample_bytree=0.6, gamma=0.04, learning_rate=0.05,
+       max_delta_step=0, max_depth=3, min_child_weight=1.5, missing=None,
+       n_estimators=2000, n_jobs=1, nthread=1, objective='reg:linear',
+       random_state=0, reg_alpha=0.45, reg_lambda=0.86, scale_pos_weight=1,
+       seed=77, silent=0, subsample=0.6)
 xgbr.fit(df_train, y)
 len(xgbr.feature_importances_)
 feat_imp = zip(df_train.columns, xgbr.feature_importances_)
 for col, weight in feat_imp:
     print(col, '-', weight)
+    
+import xgboost as xgb
+xgb.plot_importance(xgbr, max_num_features=20)
     
 
 df_test_converted = pd.get_dummies(df_test)
@@ -402,3 +460,7 @@ output = pd.DataFrame(test_ID)
 output['SalePrice'] = predictions
 
 output.to_csv('predictions.csv', index=False)
+
+predictions = np.ceil(predictions/1000) * 1000
+output['SalePrice'] = predictions
+output.to_csv('predictions_rounded.csv', index=False)

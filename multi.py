@@ -122,7 +122,8 @@ df_merged = pd.concat([train, test], axis = 0)
 '''Dimensions of new data frame'''
 df_merged.shape
 
-df_merged.loc[:,['MSSubClass', 'OverallQual', 'OverallCond', 'MoSold', 'YrSold']] = df_merged.loc[:,['MSSubClass', 'OverallQual', 'OverallCond', 'MoSold', 'YrSold']].astype('object')
+# df_merged.loc[:,['MSSubClass', 'OverallQual', 'OverallCond', 'MoSold', 'YrSold']] = df_merged.loc[:,['MSSubClass', 'OverallQual', 'OverallCond', 'MoSold', 'YrSold']].astype('object')
+df_merged.loc[:,['MSSubClass', 'MoSold', 'YrSold']] = df_merged.loc[:,['MSSubClass', 'MoSold', 'YrSold']].astype('object')
 df_merged.dtypes.value_counts()
 
 '''columns with missing observation'''
@@ -142,7 +143,8 @@ for i in to_impute_by_mode.columns:
     
 to_impute_by_median = df_merged.loc[:, ['BsmtFullBath','BsmtHalfBath', 'GarageCars', 'MasVnrArea', 'GarageYrBlt', 'BsmtFinSF1', 'BsmtFinSF2', 'BsmtUnfSF', 'TotalBsmtSF', 'GarageArea']]
 for i in to_impute_by_median.columns:
-    df_merged[i].fillna(df_merged[i].median(), inplace = True)
+    # df_merged[i].fillna(df_merged[i].median(), inplace = True)
+    df_merged[i].fillna(0, inplace = True)
 
 
 df = df_merged.drop(columns=['Id','LotFrontage'], axis=1)
